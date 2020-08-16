@@ -62,6 +62,7 @@ defmodule Oban.MixProject do
       {:ecto_sql, "~> 3.1"},
       {:jason, "~> 1.1"},
       {:postgrex, "~> 0.14"},
+      {:phoenix_pubsub, "~> 1.1 or ~> 2.0", optional: true},
       {:telemetry, "~> 0.4"},
       {:stream_data, "~> 0.4", only: [:test, :dev]},
       {:tzdata, "~> 1.0", only: [:test, :dev]},

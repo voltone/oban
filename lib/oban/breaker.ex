@@ -16,7 +16,13 @@ defmodule Oban.Breaker do
   @min_delay 100
   @jitter_mult 0.10
 
-  defmacro trip_errors, do: [DBConnection.ConnectionError, Postgrex.Error]
+  defmacro trip_errors do
+    if Code.ensure_loaded?(Postgrex.Error) do
+      [DBConnection.ConnectionError, Postgrex.Error]
+    else
+      [DBConnection.ConnectionError]
+    end
+  end
 
   @spec trip_circuit(Exception.t(), list(), state_struct()) :: state_struct()
   def trip_circuit(exception, stack, %{circuit: _, conf: conf, name: name} = state) do

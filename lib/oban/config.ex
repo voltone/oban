@@ -27,7 +27,9 @@ defmodule Oban.Config do
           rescue_interval: pos_integer(),
           shutdown_grace_period: timeout(),
           timezone: Calendar.time_zone(),
-          verbose: false | Logger.level()
+          verbose: false | Logger.level(),
+          notifier: Oban.Notifier.PostgreSQL,
+          pubsub: atom()
         }
 
   @type option :: {:name, module()} | {:conf, t()}
@@ -50,7 +52,9 @@ defmodule Oban.Config do
             rescue_interval: :timer.minutes(1),
             shutdown_grace_period: :timer.seconds(15),
             timezone: "Etc/UTC",
-            verbose: false
+            verbose: false,
+            notifier: Oban.Notifier.PostgreSQL,
+            pubsub: nil
 
   @spec start_link([option()]) :: GenServer.on_start()
   def start_link(opts) when is_list(opts) do
@@ -203,6 +207,18 @@ defmodule Oban.Config do
   defp validate_opt!({:verbose, verbose}) do
     unless verbose in ~w(false error warn info debug)a do
       raise ArgumentError, "expected :verbose to be `false` or a log level"
+    end
+  end
+
+  defp validate_opt!({:notifier, notifier}) do
+    unless notifier in [Oban.Notifier.PostgreSQL, Oban.Notifier.PhoenixPubSub] do
+      raise ArgumentError, "expected :notifier to be a known Notifier implementation"
+    end
+  end
+
+  defp validate_opt!({:pubsub, pubsub}) do
+    unless is_atom(pubsub) do
+      raise ArgumentError, "expected :pubsub to be an atom"
     end
   end
 
